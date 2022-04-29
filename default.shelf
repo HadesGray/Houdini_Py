@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shelfDocument>
+  <!-- This file contains definitions of shelves, toolbars, and tools.
+ It should not be hand-edited when it is being used by the application.
+ Note, that two definitions of the same element are not allowed in
+ a single file. -->
+
+  <tool name="script" label="Script" icon="Textport">
+    <script scriptType="hscript"><![CDATA[E:/Work/NICEDAY/Production/Scene/Model/SnowGlasses.hip]]></script>
+  </tool>
+
+  <toolshelf name="Custom_Tool" label="Custom_Tool">
+    <memberTool name="Create_basic_Node"/>
+  </toolshelf>
+
+  <tool name="Create_basic_Node" label="Create_basic_Node" icon="PLASMA_App">
+    <script scriptType="python"><![CDATA[root=hou.node('/stage')
+
+def createTemp():
+    sop=root.createNode('sublayer',node_name='model')
+    #sop.setParms({'asreference':1})
+#    sop.createNode('box').setParms({'tx':0.5})
+    #sop.createNode('grid')
+#    mein=sop.createNode('merge')
+    #mein.setNextInput('/stage/model/box1')
+    #mein.setNextInput('/stage/model/grid1')
+    
+    
+    
+    Mat_Lib=root.createNode('materiallibrary')
+    Mat_Lib.createNode('mtlxstandard_surface')
+    Mat_Lib.createNode('mtlximage',node_name='basecolor').setParms({'signature':'color'})
+    Mat_Lib.createNode('mtlximage',node_name='metalness').setParms({'signature':'float'})
+    Mat_Lib.createNode('mtlximage',node_name='rougeness').setParms({'signature':'float'})
+    Mat_Lib.createNode('mtlximage',node_name='normal').setParms({'signature':'vector3'})
+    Mat_Lib.createNode('mtlxnormalmap',node_name='normalmap')
+    Mat_Lib.layoutChildren()
+    
+    
+    merge=root.createNode('merge')
+    merge.setNextInput(sop)
+    merge.setNextInput(Mat_Lib)
+    assign=merge.createOutputNode('assignmaterial')
+    dome=root.createNode('domelight',node_name='env_light')
+    dome.parm('xn__inputstexturefile_r3ah').set('E:/HDR/Studio_Light_metal/HDRIs/GSG_PRO_STUDIOS_METAL_004.exr')
+    main=root.createNode('light',node_name='main').setParms({'tx':6.55249,'ty':5.69173, 'tz':5.15218,'rx':-32.3275,'ry':51.5123, 'rz':2.76067e-06})
+    fill=root.createNode('light',node_name='fill').setParms({'tx':-5.868,'ty':3.90111, 'tz':3.42346,'rx':-27.545,'ry':-60.1362, 'rz':-1.51011e-05})
+    back=root.createNode('light',node_name='back').setParms({'tx':-2.12492,'ty':4.99753, 'tz':-6, 'rx':-45.3479,'ry':-147.672, 'rz':1.38444e-14})
+    merge2=assign.createOutputNode('merge')
+
+    merge2.setNextInput(dome)
+
+    camera=merge2.createOutputNode('camera')
+    render=camera.createOutputNode('karma')
+    render.setDisplayFlag(True)
+    render.setParms({'trange':1,'resolutionx':1920,'resolutiony':1080,'engine':'xpu','samplesperpixel':128})
+    
+    
+createTemp()
+
+
+merge=root.node('/stage/merge2')
+
+main=root.node('/stage/main')
+main.setParms({'lighttype':4,'xn__inputswidth_zta':4,'xn__inputsheight_mva':4,'xn__inputsintensity_i0a':8})
+fill=root.node('/stage/fill')
+fill.setParms({'lighttype':4,'xn__inputswidth_zta':4,'xn__inputsheight_mva':4,'xn__inputsintensity_i0a':6})
+back=root.node('/stage/back')
+back.setParms({'lighttype':4,'xn__inputswidth_zta':4,'xn__inputsheight_mva':4,'xn__inputsintensity_i0a':8})
+
+
+
+merge.setNextInput(main)
+merge.setNextInput(fill)
+merge.setNextInput(back)
+
+root.layoutChildren()]]></script>
+    <keywordList>
+      <keyword>Create_basic_Node</keyword>
+    </keywordList>
+  </tool>
+</shelfDocument>
