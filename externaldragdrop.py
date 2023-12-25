@@ -4,6 +4,8 @@ import os
 import sys
 import platform
 
+hou.appendSessionModuleSource('''hou.hscript("autosave on")''')
+
 if sys.version_info.major < 3:
     from urllib import unquote
 else:
@@ -92,37 +94,57 @@ def import_file(network_node, file_path, file_basename, file_ext, cursor_positio
     elif network_node.type().name() == "redshift_vopnet":
         inner=network_node.node('StandardMaterial1')
         out=network_node.node('redshift_material1')
-        if "BaseColor" in file_path:
+        if "baseColor" in file_path.lower():
             albedo = network_node.createNode("redshift::TextureSampler", "BaseColor")
             albedo.setPosition(cursor_position)
             albedo.parm('tex0').set(file_path)
             inner.setInput(0,albedo)
-        elif "Diffuse" in file_path:
+        elif "diffuse" in file_path.lower():
             albedo = network_node.createNode("redshift::TextureSampler", "BaseColor")
             albedo.setPosition(cursor_position)
             albedo.parm('tex0').set(file_path)
             inner.setInput(0,albedo)
-        elif "Albedo" in file_path:
+        elif "albedo" in file_path.lower():
             albedo = network_node.createNode("redshift::TextureSampler", "BaseColor")
             albedo.setPosition(cursor_position)
             albedo.parm('tex0').set(file_path)
             inner.setInput(0,albedo)
 
-        elif "Metal" in file_path:
+        elif "metal" in file_path.lower():
             metal = network_node.createNode("redshift::TextureSampler", "Metal")
             metal.setPosition(cursor_position)
             metal.parm('tex0').set(file_path)
             metal.parm('tex0_colorSpace').set('raw')
             inner.setInput(3,metal)
 
-        elif "Rough" in file_path:
+        elif "rough" in file_path.lower():
             Rough = network_node.createNode("redshift::TextureSampler", "Roughness")
             Rough.setPosition(cursor_position)
             Rough.parm('tex0').set(file_path)
             Rough.parm('tex0_colorSpace').set('raw')
             inner.setInput(6,Rough)
+        elif "translucency" in file_path.lower():
+            Translucency = network_node.createNode("redshift::TextureSampler", "Translucency")
+            Translucency.setPosition(cursor_position)
+            Translucency.parm('tex0').set(file_path)
+            inner.parm('ms_amount').set(1)
+            inner.setInput(16,Translucency)
 
-        elif "Normal" in file_path:
+        elif "emissive" in file_path.lower():
+            Emi = network_node.createNode("redshift::TextureSampler", "Emission")
+            Emi.setPosition(cursor_position)
+            Emi.parm('tex0').set(file_path)
+            inner.parm('emission_weight').set(5)
+            inner.setInput(32,Emi)
+
+        elif "opacity" in file_path.lower():
+            Opacity = network_node.createNode("redshift::TextureSampler", "Opacity")
+            Opacity.setPosition(cursor_position)
+            Opacity.parm('tex0').set(file_path)
+            inner.setInput(33,Opacity)
+        
+
+        elif "normal" in file_path.lower():
             Normal = network_node.createNode("redshift::TextureSampler", "Normal")
             bump=network_node.createNode('BumpMap')
             Normal.setPosition(cursor_position)
@@ -133,7 +155,7 @@ def import_file(network_node, file_path, file_basename, file_ext, cursor_positio
             bump.setInput(0,Normal)
             out.setInput(2,bump)
 
-        elif "Displace" in file_path:
+        elif "displace" in file_path.lower():
             Displace = network_node.createNode("redshift::TextureSampler", "dis")
             dis=network_node.createNode('redshift::Displacement')
             Displace.setPosition(cursor_position)
@@ -141,6 +163,16 @@ def import_file(network_node, file_path, file_basename, file_ext, cursor_positio
             Displace.parm('tex0_colorSpace').set('raw')
             dis.setInput(0,Displace)
             out.setInput(1,dis)
+        elif "deight" in file_path.lower():
+            Displace = network_node.createNode("redshift::TextureSampler", "dis")
+            dis=network_node.createNode('redshift::Displacement')
+            Displace.setPosition(cursor_position)
+            Displace.parm('tex0').set(file_path)
+            Displace.parm('tex0_colorSpace').set('raw')
+            dis.setInput(0,Displace)
+            out.setInput(1,dis)
+
+
         
 
 
@@ -154,35 +186,49 @@ def import_file(network_node, file_path, file_basename, file_ext, cursor_positio
         inner=network_node.node('standard_surface1')
         out=network_node.node('OUT_material')
 
-        if "BaseColor" in file_path:
+        if "baseColor" in file_path.lower():
             albedo = network_node.createNode("arnold::image", "BaseColor")
             albedo.setPosition(cursor_position)
             albedo.parm('filename').set(file_path)
             inner.setInput(1,albedo)
-        elif "Diffuse" in file_path:
+        elif "diffuse" in file_path.lower():
             albedo = network_node.createNode("arnold::image", "BaseColor")
             albedo.setPosition(cursor_position)
             albedo.parm('filename').set(file_path)
             inner.setInput(1,albedo)
-        elif "Albedo" in file_path:
+        elif "albedo" in file_path.lower():
             albedo = network_node.createNode("arnold::image", "BaseColor")
             albedo.setPosition(cursor_position)
             albedo.parm('filename').set(file_path)
             inner.setInput(1,albedo)
 
-        elif "Metal" in file_path:
+        elif "metal" in file_path.lower():
             metal = network_node.createNode("arnold::image", "Metal")
             metal.setPosition(cursor_position)
             metal.parm('filename').set(file_path)
             inner.setInput(3,metal)
 
-        elif "Rough" in file_path:
+        elif "rough" in file_path.lower():
             Rough = network_node.createNode("arnold::image", "Roughness")
             Rough.setPosition(cursor_position)
             Rough.parm('filename').set(file_path)
             inner.setInput(6,Rough)
 
-        elif "Normal" in file_path:
+        elif "translucency" in file_path.lower():
+            Translucency = network_node.createNode("arnold::image", "Translucency")
+            Translucency.setPosition(cursor_position)
+            Translucency.parm('filename').set(file_path)
+            inner.parm('subsurface').set(1)
+            inner.setInput(18,Translucency)
+
+        elif "emissive" in file_path.lower():
+            Emissive = network_node.createNode("arnold::image", "Emissive")
+            Emissive.setPosition(cursor_position)
+            Emissive.parm('filename').set(file_path)
+            inner.parm('emission').set(5)
+            inner.setInput(37,Emissive)
+
+        elif "normal" in file_path.lower():
             Normal = network_node.createNode("arnold::image", "Normal")
             bump=network_node.createNode('arnold::bump2d','bump')
             Normal.setPosition(cursor_position)
@@ -191,7 +237,21 @@ def import_file(network_node, file_path, file_basename, file_ext, cursor_positio
             bump.setInput(0,Normal)
             inner.setInput(39,bump)
 
-        elif "Displace" in file_path:
+        elif "opacity" in file_path.lower():
+            Opacity = network_node.createNode("arnold::image", "Opacity")
+            Opacity.setPosition(cursor_position)
+            Opacity.parm('file').set(file_path)
+            inner.setInput(38,Opacity)
+
+        elif "displace" in file_path.lower():
+            Displace = network_node.createNode("arnold::image", "dis")
+            dis=network_node.createNode('arnold::bump3d','displace')
+            Displace.setPosition(cursor_position)
+            Displace.parm('filename').set(file_path)
+            dis.parm('bump_height').set(0.1)
+            dis.setInput(0,Displace)
+            out.setInput(1,dis)
+        elif "height" in file_path.lower():
             Displace = network_node.createNode("arnold::image", "dis")
             dis=network_node.createNode('arnold::bump3d','displace')
             Displace.setPosition(cursor_position)
@@ -205,37 +265,53 @@ def import_file(network_node, file_path, file_basename, file_ext, cursor_positio
         out=network_node.node('surface_output')
         out2=network_node.node('displacement_output')
 
-        if "BaseColor" in file_path:
+        if "baseColor" in file_path.lower():
             albedo = network_node.createNode("mtlximage", "BaseColor")
             albedo.setPosition(cursor_position)
             albedo.parm('file').set(file_path)
             inner.setInput(1,albedo)
-        elif "Diffuse" in file_path:
+        elif "diffuse" in file_path.lower():
             albedo = network_node.createNode("mtlximage", "BaseColor")
             albedo.setPosition(cursor_position)
             albedo.parm('file').set(file_path)
             inner.setInput(1,albedo)
-        elif "Albedo" in file_path:
+        elif "albedo" in file_path.lower():
             albedo = network_node.createNode("mtlximage", "BaseColor")
             albedo.setPosition(cursor_position)
             albedo.parm('file').set(file_path)
             inner.setInput(1,albedo)
 
-        elif "Metal" in file_path:
+        elif "metal" in file_path.lower():
             metal = network_node.createNode("mtlximage", "Metal")
             metal.setPosition(cursor_position)
             metal.parm('signature').set('Float')
             metal.parm('file').set(file_path)
             inner.setInput(3,metal)
 
-        elif "Rough" in file_path:
+        elif "rough" in file_path.lower():
             Rough = network_node.createNode("mtlximage", "Roughness")
             Rough.setPosition(cursor_position)
             Rough.parm('signature').set('Float')
             Rough.parm('file').set(file_path)
             inner.setInput(6,Rough)
 
-        elif "Normal" in file_path:
+        elif "translucency" in file_path.lower():
+            Translucency = network_node.createNode("mtlximage", "Translucency")
+            Translucency.setPosition(cursor_position)
+            Translucency.parm('signature').set('Float')
+            Translucency.parm('file').set(file_path)
+            inner.parm('subsurface').set(1)
+            inner.setInput(18,Translucency)
+
+        elif "emissive" in file_path.lower():
+            Emissive = network_node.createNode("mtlximage", "Emissive")
+            Emissive.setPosition(cursor_position)
+            # Emissive.parm('signature').set('Color')
+            Emissive.parm('file').set(file_path)
+            inner.parm('emission').set(5)
+            inner.setInput(37,Emissive)
+
+        elif "normal" in file_path.lower():
             Normal = network_node.createNode("mtlximage", "Normal")
             bump=network_node.createNode('mtlxnormalmap','normal_map')
             Normal.setPosition(cursor_position)
@@ -244,7 +320,22 @@ def import_file(network_node, file_path, file_basename, file_ext, cursor_positio
             bump.setInput(0,Normal)
             inner.setInput(40,bump)
 
-        elif "Displace" in file_path:
+        elif "opacity" in file_path.lower():
+            Opacity = network_node.createNode("mtlximage", "Opacity")
+            Opacity.setPosition(cursor_position)
+            Opacity.parm('file').set(file_path)
+            inner.setInput(38,Opacity)
+
+        elif "displace" in file_path.lower():
+            Displace = network_node.createNode("mtlximage", "dis")
+            dis=network_node.createNode('mtlxdisplacement','displace')
+            Displace.setPosition(cursor_position)
+            Displace.parm('signature').set('Float')
+            Displace.parm('file').set(file_path)
+            dis.parm('scale').set(0.1)
+            dis.setInput(0,Displace)
+            out2.setInput(0,dis)
+        elif "height" in file_path.lower():
             Displace = network_node.createNode("mtlximage", "dis")
             dis=network_node.createNode('mtlxdisplacement','displace')
             Displace.setPosition(cursor_position)
